@@ -36,17 +36,17 @@ import pyscf.tools
 import pyscf.lib
 from pyscf.lib import logger
 from pyscf import mcscf, symm
+from pyscf import __config__
 
 from . import symm_utils
 
+TOL = getattr(__config__, 'fcidump_write_tol', 1e-12)
 ndpointer = numpy.ctypeslib.ndpointer
 
 # Settings
 try:
     from pyscf.shciscf import settings
 except ImportError:
-    from pyscf import __config__
-
     settings = lambda: None
     settings.SHCIEXE = getattr(__config__, "shci_SHCIEXE", None)
     settings.SHCISCRATCHDIR = getattr(__config__, "shci_SHCISCRATCHDIR", None)
@@ -106,6 +106,7 @@ fcidumpFromIntegral.argtypes = [
     ctypes.c_double,
     ndpointer(ctypes.c_int32, flags="C_CONTIGUOUS"),
     ctypes.c_size_t,
+    ctypes.c_double,
 ]
 
 r2RDM = shciLib.r2RDM
@@ -1261,7 +1262,7 @@ def DinfhtoD2h(SHCI, norb, nelec):
     return nRows, rowIndex, rowCoeffs
 
 
-def writeIntegralFile(SHCI, h1eff, eri_cas, norb, nelec, ecore=0):
+def writeIntegralFile(SHCI, h1eff, eri_cas, norb, nelec, ecore=0, tol=TOL):
     if isinstance(nelec, (int, numpy.integer)):
         neleca = nelec // 2 + nelec % 2
         nelecb = nelec - neleca
@@ -1324,6 +1325,7 @@ def writeIntegralFile(SHCI, h1eff, eri_cas, norb, nelec, ecore=0):
             ecore,
             numpy.asarray(orbsym, dtype=numpy.int32),
             abs(neleca - nelecb),
+            tol,
         )
 
 

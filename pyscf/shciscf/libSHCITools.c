@@ -220,12 +220,12 @@ void writeHCore ( FILE * fOut, double * h1e, int norb, double tol )
 // should be used when working with large active spaces.
 void fcidumpFromIntegral ( char * fileName, double * h1eff, double * eri,
 			   size_t norb, size_t nelec, double ecore, 
-			   int* orbsym, size_t ms )
+			   int* orbsym, size_t ms, double tol )
 {
   FILE * fOut = fopen( fileName, "w");
   writeFDHead( fOut, norb, nelec, ms, orbsym );
-  writeERI( fOut, eri, norb, 1e-12 );
-  writeHCore( fOut, h1eff, norb, 1e-12 );
+  writeERI( fOut, eri, norb, tol );
+  writeHCore( fOut, h1eff, norb, tol );
   fprintf( fOut, "%20.12f   %d  %d  %d  %d\n", ecore, 0,0,0,0);
   fclose(fOut);
 }
