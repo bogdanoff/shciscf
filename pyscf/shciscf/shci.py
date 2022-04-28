@@ -1609,6 +1609,13 @@ def dryrun(mc, mo_coeff=None):
     # Set orbsym b/c it's needed in `writeIntegralFile()`
     if mc.fcisolver.orbsym is not []:
         mc.fcisolver.orbsym = getattr(mo_coeff, "orbsym", [])
+    if (not getattr(mc.fcisolver.orbsym, '__len__', None)) or len(mc.fcisolver.orbsym) == 0:
+        mc.fcisolver.orbsym = symm.label_orb_symm(mc.mol, mc.mol.irrep_id, mc.mol.symm_orb,
+                                                  mo_coeff, s=mc._scf.get_ovlp())
+    log = logger.new_logger(mc)
+    if mc.verbose >= logger.WARN:
+        mc.check_sanity()
+    mc.dump_flags(log)
 
     # mc.kernel(mo_coeff) # Works, but runs full CASCI/CASSCF
     h1e, ecore = mc.get_h1eff(mo_coeff)
